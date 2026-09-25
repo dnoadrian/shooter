@@ -38,10 +38,32 @@ function quadrantBrushes() {
   ];
 }
 
+// Purely visual detail: battlements, pilasters, pillar capitals.
+function quadrantDecor() {
+  const deco = { solid: false };
+  const out = [];
+  for (let x = -1072; x < 1024; x += 96) {
+    out.push(boxBrush([x, 704, -1088], [x + 48, 752, -1024], { ...deco, mat: 'wall', top: 'stone' }));
+  }
+  out.push(boxBrush([-1088, 688, -1032], [1024, 704, -1016], { ...deco, mat: 'stone2' }));
+  for (const x of [-736, -560, -224, 32, 304, 528, 736]) {
+    out.push(boxBrush([x - 14, 0, -800], [x + 14, 176, -794], { ...deco, mat: 'pillar' }));
+  }
+  out.push(boxBrush([-684, 448, -684], [-532, 472, -532], { ...deco, mat: 'stone2', top: 'metal' }));
+  out.push(boxBrush([-640, 472, -640], [-576, 488, -576], { ...deco, mat: 'trim' }));
+  return out;
+}
+
 function centerBrushes() {
+  const posts = [];
+  for (const [x, z] of [[-1, -1], [1, -1], [1, 1], [-1, 1]]) {
+    const a = [x < 0 ? -128 : 104, TOWER, z < 0 ? -128 : 104];
+    posts.push(boxBrush(a, [a[0] + 24, TOWER + 72, a[2] + 24], { mat: 'tower', top: 'trim' }));
+  }
   return [
-    // the spire
+    // the spire, with a post on each corner of its top
     boxBrush([-128, -64, -128], [128, TOWER, 128], { side: 'tower', top: 'metal', bottom: 'stone' }),
+    ...posts,
     // lava pool bottom
     boxBrush([-320, -128, -320], [320, -64, 320], { mat: 'lavarock' }),
   ];
@@ -82,6 +104,7 @@ export function buildMap() {
   const lamps = [];
   for (let k = 0; k < 4; k++) {
     for (const b of quadrantBrushes()) brushes.push(k ? rotateBrush(b, k) : b);
+    for (const b of quadrantDecor()) brushes.push(k ? rotateBrush(b, k) : b);
     const r = (p) => rotY(p, k);
     // ground pad -> top of the spire
     pads.push(makePad(r([0, 0, -560]), 40, r([0, TOWER, -40]), 140));

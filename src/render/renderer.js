@@ -153,7 +153,7 @@ export class Renderer {
           this.viewLight.intensity = 40;
         }
         this.effects.rail(start, ev.end, ev.player.color, ev.normal, ev.hitWorld);
-        this.effects.flashLight(ev.start, ev.player.color, 25000, 0.12);
+        this.effects.flashLight(ev.start, ev.player.color, 6000, 0.12);
         break;
       }
       case 'frag':
@@ -246,8 +246,8 @@ export class Renderer {
       const sway = Math.sin(this.bob) * 0.8 * bobAmt;
       const lift = Math.abs(Math.cos(this.bob)) * 0.6 * bobAmt;
       const hand = this.settings.hand === 'left' ? -1 : 1;
-      gun.position.set(hand * (6.2 + sway * 0.5), -6.8 + lift * 0.5 - this.landDip * 0.05 - kick * 0.8, -13 + kick * 4);
-      gun.rotation.set(kick * 0.2, hand * 0.05, 0);
+      gun.position.set(hand * (7.2 + sway * 0.5), -7.6 + lift * 0.5 - this.landDip * 0.05 - kick * 0.8, -13 + kick * 4);
+      gun.rotation.set(0.04 + kick * 0.2, hand * 0.1, hand * -0.06);
       gun.userData.setCharge(1 - local.reload / RAIL_RELOAD);
       this.viewLight.intensity = Math.max(0, this.viewLight.intensity - dt * 400);
       gun.visible = this.zoom < 0.6 && this.settings.drawGun;

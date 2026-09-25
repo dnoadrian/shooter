@@ -32,11 +32,16 @@ export function buildRailgun(color, detail = false, glow = 2.4) {
     rail.position.set(sx, 1, -18);
     g.add(rail);
   }
+  // dark shroud under the coils so they read as separate rings
+  const shroud = new THREE.Mesh(new THREE.CylinderGeometry(1.9, 1.9, 24, seg), dark);
+  shroud.rotation.x = Math.PI / 2;
+  shroud.position.set(0, 1, -19);
+  g.add(shroud);
   const coils = [];
-  for (let i = 0; i < 6; i++) {
+  for (let i = 0; i < 5; i++) {
     const m = coilMat.clone();
-    const coil = new THREE.Mesh(new THREE.TorusGeometry(3.1, 0.9, detail ? 8 : 5, seg), m);
-    coil.position.set(0, 1, -8 - i * 4.8);
+    const coil = new THREE.Mesh(new THREE.TorusGeometry(2.5, 0.45, detail ? 8 : 5, seg), m);
+    coil.position.set(0, 1, -9 - i * 5.2);
     g.add(coil);
     coils.push(coil);
   }
@@ -56,7 +61,7 @@ export function buildRailgun(color, detail = false, glow = 2.4) {
     // charge: 0 just fired .. 1 ready
     setCharge(charge) {
       coils.forEach((c, i) => {
-        const lit = charge >= 1 ? 1 : Math.max(0, Math.min(1, charge * 6 - i));
+        const lit = charge >= 1 ? 1 : Math.max(0, Math.min(1, charge * coils.length - i));
         c.material.emissiveIntensity = (charge >= 1 ? 1 : 0.03 + lit * 0.55) * glow;
       });
     },

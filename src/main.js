@@ -8,7 +8,7 @@ import { NavGraph } from './sim/nav.js';
 import { Renderer } from './render/renderer.js';
 import { Audio } from './audio.js';
 import { Input } from './input.js';
-import { Hud, CROSSHAIR_COUNT } from './hud.js';
+import { Hud, CROSSHAIR_COUNT, ordinal } from './hud.js';
 import { loadSettings, saveSettings } from './settings.js';
 
 const $ = (id) => document.getElementById(id);
@@ -315,8 +315,8 @@ function onIntermission(ev) {
   const won = ev.winner === local;
   $('im-title').textContent = won ? 'YOU WIN' : `${ev.winner.name.toUpperCase()} WINS`;
   $('im-title').style.color = won ? '' : ev.winner.color;
-  const { rank } = game.rankOf(local);
-  $('im-sub').textContent = `${ev.reason} · you finished ${['', '1st', '2nd', '3rd'][rank] || rank + 'th'} with ${local.score} frag${local.score === 1 ? '' : 's'}`;
+  const { rank, tied } = game.rankOf(local);
+  $('im-sub').textContent = `${ev.reason} · you finished ${tied ? 'tied for ' : ''}${ordinal(rank)} with ${local.score} frag${local.score === 1 ? '' : 's'}`;
   audio.announce(won ? 'You win!' : 'You lose.');
   setTimeout(() => {
     if (mode === 'over') show('intermission', true);

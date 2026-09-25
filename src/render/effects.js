@@ -225,7 +225,7 @@ export class Effects {
       }
       this.particle([b.x, b.y, b.z], [0, 0, 0], hot, 60, 0.18);
       this.decal(b, n, color);
-      this.flashLight([b.x + n.x * 10, b.y + n.y * 10, b.z + n.z * 10], color, 30000, 0.25);
+      this.flashLight([b.x + n.x * 16, b.y + n.y * 16, b.z + n.z * 16], color, 7000, 0.25);
     }
   }
 

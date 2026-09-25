@@ -53,7 +53,7 @@ export function buildWorld(map, scene, quality) {
     vertexShader: `
       varying vec2 vPos;
       void main() {
-        vPos = position.xz;
+        vPos = (modelMatrix * vec4(position, 1.0)).xz;
         gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
       }`,
     fragmentShader: `
@@ -74,9 +74,10 @@ export function buildWorld(map, scene, quality) {
         vec2 p = vPos / 90.0;
         vec2 q = vec2(fbm(p + uTime * 0.05), fbm(p + vec2(5.2, 1.3) - uTime * 0.04));
         float f = fbm(p + 2.5 * q + uTime * 0.03);
-        float crust = smoothstep(0.45, 0.75, f);
-        vec3 hot = mix(vec3(1.6, 0.45, 0.05), vec3(2.2, 1.2, 0.3), smoothstep(0.2, 0.0, f - 0.3));
-        vec3 col = mix(hot, vec3(0.12, 0.03, 0.02), crust);
+        float crust = smoothstep(0.42, 0.62, f);
+        float veins = smoothstep(0.08, 0.0, abs(f - 0.36));
+        vec3 hot = mix(vec3(0.9, 0.22, 0.02), vec3(1.5, 0.7, 0.12), veins);
+        vec3 col = mix(hot, vec3(0.09, 0.025, 0.02), crust);
         gl_FragColor = vec4(col, 1.0);
         #include <tonemapping_fragment>
         #include <colorspace_fragment>

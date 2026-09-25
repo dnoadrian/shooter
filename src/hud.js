@@ -239,6 +239,7 @@ export class Hud {
     const showBoard = opts.scores || dead || game.phase === 'intermission';
     const board = $('scoreboard');
     board.classList.toggle('hidden', !showBoard);
+    board.classList.toggle('inter', game.phase === 'intermission');
     if (showBoard) this.renderScoreboard(game, board);
   }
 
