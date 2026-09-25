@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Instagib Arena</title>
+    <meta name="description" content="A Quake 3 Arena style instagib deathmatch in the browser: railguns only, one hit, one frag." />
+    <meta name="theme-color" content="#120709" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <canvas id="game"></canvas>
+    <div id="loading"><div class="spinner"></div>Forging the arena…</div>
+
+    <div id="hud" class="hidden">
+      <div id="crosshair"></div>
+      <div id="reload"><div></div></div>
+      <div id="xname"></div>
+      <div id="killfeed"></div>
+      <div id="center"><div id="center-main"></div><div id="center-sub"></div></div>
+      <div id="award"></div>
+      <div id="countdown"></div>
+      <div id="timer"></div>
+      <div id="scorebox"><div class="me">0</div><div class="other">0</div><div class="limit"></div></div>
+      <div id="awards-count"></div>
+      <div id="speed"></div>
+      <div id="fps"></div>
+      <div id="death"><div id="death-msg"></div><div id="respawn">Click to respawn</div></div>
+      <div id="zoomfx"></div>
+    </div>
+    <div id="scoreboard" class="hidden"></div>
+
+    <div id="menu" class="overlay hidden">
+      <div class="menu-inner">
+        <header class="title">
+          <h1><span>INSTAGIB</span> <em>ARENA</em></h1>
+          <p class="tag">Railguns only · one hit, one frag</p>
+        </header>
+        <div class="cols">
+          <section class="panel">
+            <h2>Match</h2>
+            <label class="row"><span>Name</span><input id="opt-name" maxlength="16" autocomplete="off" spellcheck="false" /></label>
+            <div class="row"><span>Rail colour</span><div id="swatches" class="swatches"></div></div>
+            <label class="row"><span>Bots</span>
+              <select id="opt-bots">
+                <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option>
+                <option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option>
+              </select>
+            </label>
+            <label class="row"><span>Bot skill</span>
+              <select id="opt-skill">
+                <option value="1">1 · Recruit</option><option value="2">2 · Soldier</option><option value="3">3 · Veteran</option>
+                <option value="4">4 · Elite</option><option value="5">5 · Nightmare</option>
+              </select>
+            </label>
+            <label class="row"><span>Frag limit</span>
+              <select id="opt-frag"><option value="10">10</option><option value="15">15</option><option value="20">20</option><option value="30">30</option><option value="50">50</option><option value="0">None</option></select>
+            </label>
+            <label class="row"><span>Time limit</span>
+              <select id="opt-time"><option value="5">5 min</option><option value="10">10 min</option><option value="15">15 min</option><option value="20">20 min</option><option value="0">None</option></select>
+            </label>
+            <p class="map-name">Arena: <strong>The Molten Spire</strong></p>
+            <button id="btn-fight" class="big-btn" type="button">FIGHT</button>
+            <button id="btn-back" class="btn only-pause" type="button">Back to game</button>
+          </section>
+          <section class="panel">
+            <h2>Settings</h2>
+            <label class="row"><span>Sensitivity</span><input id="opt-sens" type="range" min="0.5" max="15" step="0.1" /><output id="opt-sens-v"></output></label>
+            <label class="row"><span>Field of view</span><input id="opt-fov" type="range" min="80" max="130" step="1" /><output id="opt-fov-v"></output></label>
+            <label class="row"><span>Volume</span><input id="opt-volume" type="range" min="0" max="1" step="0.05" /><output id="opt-volume-v"></output></label>
+            <div class="row"><span>Crosshair</span><div id="xhair" class="xhair"></div></div>
+            <div class="checks">
+              <label><input id="opt-invert" type="checkbox" /> Invert mouse</label>
+              <label><input id="opt-announcer" type="checkbox" /> Announcer voice</label>
+              <label><input id="opt-bloom" type="checkbox" /> Bloom</label>
+              <label><input id="opt-gun" type="checkbox" /> Draw gun</label>
+              <label><input id="opt-speed" type="checkbox" /> Speedometer</label>
+              <label><input id="opt-fps" type="checkbox" /> FPS counter</label>
+            </div>
+            <label class="row"><span>Graphics</span>
+              <select id="opt-quality"><option value="high">High (shadows, AA)</option><option value="low">Low (fast)</option></select>
+            </label>
+            <p id="quality-note" class="note"></p>
+          </section>
+          <section class="panel controls">
+            <h2>Controls</h2>
+            <dl>
+              <dt>Mouse</dt><dd>Aim</dd>
+              <dt>Left click</dt><dd>Fire railgun</dd>
+              <dt>Right click / E</dt><dd>Zoom</dd>
+              <dt>W A S D</dt><dd>Move</dd>
+              <dt>Space</dt><dd>Jump (hold to bunny hop)</dd>
+              <dt>C</dt><dd>Crouch</dd>
+              <dt>Tab</dt><dd>Scores</dd>
+              <dt>F</dt><dd>Toggle FPS</dd>
+              <dt>Esc</dt><dd>Pause</dd>
+            </dl>
+            <p class="note">Every rail kills. The gun needs 1.5 s to recharge, so make it count. Strafe-jump to build speed, ride the jump pads to the spire, and stay out of the lava.</p>
+          </section>
+        </div>
+      </div>
+    </div>
+
+    <div id="pause" class="overlay hidden">
+      <div class="dialog">
+        <h2>Paused</h2>
+        <button id="btn-resume" class="big-btn" type="button">Resume</button>
+        <button id="btn-settings" class="btn" type="button">Settings</button>
+        <button id="btn-restart" class="btn" type="button">Restart match</button>
+        <button id="btn-quit" class="btn" type="button">Quit to menu</button>
+      </div>
+    </div>
+
+    <div id="intermission" class="hidden">
+      <h2 id="im-title"></h2>
+      <p id="im-sub"></p>
+      <div class="im-buttons">
+        <button id="btn-again" class="big-btn" type="button">Play again</button>
+        <button id="btn-menu" class="btn" type="button">Main menu</button>
+      </div>
+    </div>
+
+    <script type="module" src="src/main.js"></script>
+  </body>
+</html>
