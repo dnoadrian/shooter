@@ -126,6 +126,11 @@ input.onLook = (dx, dy) => {
 
 input.onKey = (code) => {
   if (code === 'KeyF' && mode === 'play') settings.showFps = !settings.showFps;
+  // browsers normally swallow Esc to release the pointer; handle it if it arrives
+  if ((code === 'Escape' || code === 'KeyP') && mode === 'play' && game.phase !== 'intermission') {
+    pause();
+    input.unlock();
+  }
 };
 
 // settings form <-> settings object
@@ -354,6 +359,9 @@ function frame(now) {
   audio.setListener(cam.position, fwd);
 }
 
+if (window.matchMedia && matchMedia('(pointer: coarse)').matches && !matchMedia('(any-pointer: fine)').matches) {
+  show('device-note', true);
+}
 $('loading').remove();
 show('menu', true);
 requestAnimationFrame(frame);

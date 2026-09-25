@@ -692,6 +692,10 @@ button:focus-visible {
   accent-color: var(--accent);
 }
 
+.note.warn {
+  color: var(--accent-2);
+}
+
 .map-name {
   color: var(--dim);
   font-size: 13px;
@@ -774,8 +778,16 @@ button:focus-visible {
   display: block;
 }
 
-#menu.from-pause #btn-fight {
+#menu.from-pause .match,
+#menu.from-pause .controls,
+#menu.from-pause .title {
   display: none;
+}
+
+#menu.from-pause .cols {
+  grid-template-columns: minmax(0, 440px);
+  justify-content: center;
+  margin-top: 8vh;
 }
 
 .dialog {

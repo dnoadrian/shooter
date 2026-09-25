@@ -5,6 +5,41 @@ import * as THREE from '../../vendor/three.js';
 
 const box = (w, h, d, mat) => new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat);
 
+// Merge the direct mesh children of `parent` that share a material into one
+// mesh each, to keep draw calls down (every player is built from ~30 parts).
+function mergeByMaterial(parent, skip = new Set()) {
+  const groups = new Map();
+  for (const c of parent.children) {
+    if (!c.isMesh || skip.has(c)) continue;
+    if (!groups.has(c.material)) groups.set(c.material, []);
+    groups.get(c.material).push(c);
+  }
+  for (const [mat, meshes] of groups) {
+    if (meshes.length < 2) continue;
+    const parts = meshes.map((m) => {
+      m.updateMatrix();
+      const g = m.geometry.index ? m.geometry.toNonIndexed() : m.geometry.clone();
+      g.applyMatrix4(m.matrix);
+      return g;
+    });
+    const merged = new THREE.BufferGeometry();
+    for (const name of ['position', 'normal', 'uv']) {
+      const size = parts[0].attributes[name].itemSize;
+      const total = parts.reduce((n, g) => n + g.attributes[name].array.length, 0);
+      const arr = new Float32Array(total);
+      let off = 0;
+      for (const g of parts) {
+        arr.set(g.attributes[name].array, off);
+        off += g.attributes[name].array.length;
+      }
+      merged.setAttribute(name, new THREE.BufferAttribute(arr, size));
+    }
+    for (const m of meshes) parent.remove(m);
+    const mesh = new THREE.Mesh(merged, mat);
+    parent.add(mesh);
+  }
+}
+
 // Railgun: body, barrel, side rails and a row of coils that glow while charged.
 export function buildRailgun(color, detail = false, glow = 2.4) {
   const g = new THREE.Group();
@@ -37,14 +72,22 @@ export function buildRailgun(color, detail = false, glow = 2.4) {
   shroud.rotation.x = Math.PI / 2;
   shroud.position.set(0, 1, -19);
   g.add(shroud);
+  // first person: each coil lights up separately while charging;
+  // third person: the coils are one mesh that glows once charged
   const coils = [];
+  const coilGroup = new THREE.Group();
   for (let i = 0; i < 5; i++) {
-    const m = coilMat.clone();
-    const coil = new THREE.Mesh(new THREE.TorusGeometry(2.5, 0.45, detail ? 8 : 5, seg), m);
+    const coil = new THREE.Mesh(new THREE.TorusGeometry(2.5, 0.45, detail ? 8 : 5, seg), detail ? coilMat.clone() : coilMat);
     coil.position.set(0, 1, -9 - i * 5.2);
-    g.add(coil);
+    coilGroup.add(coil);
     coils.push(coil);
   }
+  if (!detail) {
+    mergeByMaterial(coilGroup);
+    coils.length = 0;
+    coils.push(coilGroup.children[0]);
+  }
+  g.add(coilGroup);
   const tip = new THREE.Mesh(new THREE.CylinderGeometry(2.2, 1.6, 3, seg), dark);
   tip.rotation.x = Math.PI / 2;
   tip.position.set(0, 1, -37);
@@ -52,6 +95,7 @@ export function buildRailgun(color, detail = false, glow = 2.4) {
   const sight = box(1.2, 2.4, 6, dark);
   sight.position.set(0, 4, 2);
   g.add(sight);
+  mergeByMaterial(g);
   g.traverse((o) => {
     if (o.isMesh) o.castShadow = true;
   });
@@ -61,7 +105,7 @@ export function buildRailgun(color, detail = false, glow = 2.4) {
     // charge: 0 just fired .. 1 ready
     setCharge(charge) {
       coils.forEach((c, i) => {
-        const lit = charge >= 1 ? 1 : Math.max(0, Math.min(1, charge * coils.length - i));
+        const lit = charge >= 1 ? 1 : coils.length === 1 ? charge * 0.5 : Math.max(0, Math.min(1, charge * coils.length - i));
         c.material.emissiveIntensity = (charge >= 1 ? 1 : 0.03 + lit * 0.55) * glow;
       });
     },
@@ -146,6 +190,7 @@ export function buildPlayerModel(colorHex) {
   gun.position.set(4, -1, -12);
   arms.add(gun);
 
+  for (const group of [lower, upper, neck, arms, ...legs.flatMap((l) => [l.leg, l.knee])]) mergeByMaterial(group);
   root.traverse((o) => {
     if (o.isMesh) o.castShadow = true;
   });

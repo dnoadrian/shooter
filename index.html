@@ -37,7 +37,7 @@
           <p class="tag">Railguns only · one hit, one frag</p>
         </header>
         <div class="cols">
-          <section class="panel">
+          <section class="panel match">
             <h2>Match</h2>
             <label class="row"><span>Name</span><input id="opt-name" maxlength="16" autocomplete="off" spellcheck="false" /></label>
             <div class="row"><span>Rail colour</span><div id="swatches" class="swatches"></div></div>
@@ -60,10 +60,10 @@
               <select id="opt-time"><option value="5">5 min</option><option value="10">10 min</option><option value="15">15 min</option><option value="20">20 min</option><option value="0">None</option></select>
             </label>
             <p class="map-name">Arena: <strong>The Molten Spire</strong></p>
+            <p id="device-note" class="note warn hidden">This game needs a keyboard and mouse.</p>
             <button id="btn-fight" class="big-btn" type="button">FIGHT</button>
-            <button id="btn-back" class="btn only-pause" type="button">Back to game</button>
           </section>
-          <section class="panel">
+          <section class="panel settings">
             <h2>Settings</h2>
             <label class="row"><span>Sensitivity</span><input id="opt-sens" type="range" min="0.5" max="15" step="0.1" /><output id="opt-sens-v"></output></label>
             <label class="row"><span>Field of view</span><input id="opt-fov" type="range" min="80" max="130" step="1" /><output id="opt-fov-v"></output></label>
@@ -81,6 +81,7 @@
               <select id="opt-quality"><option value="high">High (shadows, AA)</option><option value="low">Low (fast)</option></select>
             </label>
             <p id="quality-note" class="note"></p>
+            <button id="btn-back" class="big-btn only-pause" type="button">Back to game</button>
           </section>
           <section class="panel controls">
             <h2>Controls</h2>
