@@ -101,6 +101,7 @@ function pause() {
 
 function resume() {
   if (mode !== 'paused') return;
+  show('lock-note', false);
   audio.init();
   mode = 'play';
   show('pause', false);
@@ -110,6 +111,7 @@ function resume() {
 input.onLockChange = (locked, failed) => {
   if (!locked && mode === 'play' && game.phase !== 'intermission') pause();
   if (failed && mode === 'play') pause();
+  show('lock-note', !!failed && mode === 'paused');
 };
 
 input.onLook = (dx, dy) => {

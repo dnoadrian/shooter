@@ -8,8 +8,8 @@
   --accent-2: #ffcf4a;
   --danger: #ff3b3b;
   --hud-num: #ffd24a;
-  --font-ui: 'Segoe UI', system-ui, -apple-system, Roboto, Helvetica, Arial, sans-serif;
-  --font-heavy: Impact, Haettenschweiler, 'Arial Narrow Bold', 'Arial Black', sans-serif;
+  --font-ui: 'Barlow Semi Condensed', 'Segoe UI', system-ui, -apple-system, Roboto, Helvetica, Arial, sans-serif;
+  --font-heavy: 'Russo One', Impact, Haettenschweiler, 'Arial Narrow Bold', 'Arial Black', sans-serif;
   color-scheme: dark;
 }
 
@@ -837,4 +837,19 @@ button:focus-visible {
   transform: translateX(-50%);
   width: min(320px, calc(100vw - 32px));
   pointer-events: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #award.show {
+    animation-duration: 0.01s;
+    opacity: 1;
+  }
+
+  #respawn {
+    animation: none;
+  }
+
+  .spinner {
+    animation-duration: 2s;
+  }
 }

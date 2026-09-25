@@ -6,6 +6,9 @@
     <title>Instagib Arena</title>
     <meta name="description" content="A Quake 3 Arena style instagib deathmatch in the browser: railguns only, one hit, one frag." />
     <meta name="theme-color" content="#120709" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Russo+One&family=Barlow+Semi+Condensed:wght@400;600;700&display=swap" />
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
@@ -105,6 +108,7 @@
     <div id="pause" class="overlay hidden">
       <div class="dialog">
         <h2>Paused</h2>
+        <p id="lock-note" class="note warn hidden">The browser didn't capture the mouse. Click Resume to try again.</p>
         <button id="btn-resume" class="big-btn" type="button">Resume</button>
         <button id="btn-settings" class="btn" type="button">Settings</button>
         <button id="btn-restart" class="btn" type="button">Restart match</button>

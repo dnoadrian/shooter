@@ -21,3 +21,11 @@ if (html.includes('src/main.js') || html.includes('href="style.css"')) throw new
 await mkdir('dist', { recursive: true });
 await writeFile('dist/instagib.html', html);
 console.log(`dist/instagib.html  ${(html.length / 1024).toFixed(0)} KB`);
+
+// Fragment variant for hosts that supply their own <html>/<head>/<body>
+// skeleton: head content (minus charset/viewport) followed by the body.
+const head = html.match(/<head>([\s\S]*)<\/head>/)[1].replace(/<meta (charset|name="viewport")[^>]*>\s*/g, '');
+const body = html.match(/<body>([\s\S]*)<\/body>/)[1];
+const fragment = `${head.trim()}\n${body.trim()}\n`;
+await writeFile('dist/instagib-fragment.html', fragment);
+console.log(`dist/instagib-fragment.html  ${(fragment.length / 1024).toFixed(0)} KB`);
